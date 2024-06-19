@@ -1,0 +1,107 @@
+<div class="alert">
+  <div class="alert__line" id="marquee">
+    <div class="alert__message">
+      <img class="alert__image" src="https://uxwing.com/wp-content/themes/uxwing/download/signs-and-symbols/alert-icon.png" alt="**">
+      JS smooth infinite marquee!
+    </div>
+  </div>
+</div>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --gap: 20px;
+}
+
+.alert {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.alert__line {
+  display: flex;
+  padding: 10px 0;
+  gap: calc(var(--gap) / 2);
+  background-color: #e84545;
+}
+
+.alert__message {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap) / 2 - 2px);
+  font-size: 16px;
+  left: 0;
+  line-height: 130%;
+  white-space: nowrap;
+  color: #f9f7f7;
+}
+
+.alert__image {
+  width: 20px;
+  height: 20px;
+}
+
+</style>  
+
+<script>
+jQuery("document").ready(function () {
+  const speed = 1; // pixels at frame
+  const gap = getComputedStyle(document.querySelector("body")).getPropertyValue(
+    "--gap"
+  ); // IMPORTANT: value should be equal to --gap variable at css
+  const marquee = document.querySelector("#marquee");
+
+  const newItem = () => {
+    return marquee.querySelector("div").cloneNode(true);
+  };
+
+  const numerify = (str) => {
+    return +str.replaceAll(/[^\d-]/g, "");
+  };
+
+  const fillMarquee = () => {
+    while (
+      marquee.querySelectorAll("div").length < 2 ||
+      (marquee.querySelector("div").clientWidth + numerify(gap)) *
+        marquee.querySelectorAll("div").length -
+        numerify(gap) <
+        window.innerWidth * 1.5
+    ) {
+      marquee.append(newItem());
+    }
+
+    marquee.querySelectorAll("div").forEach((item) => {
+      if (item.style.position !== "absolute") item.style.position = "relative";
+    });
+  };
+  //fillMarquee();
+  window.addEventListener("resize", fillMarquee);
+
+  const render = () => {
+    marquee.querySelectorAll("div").forEach((item) => {
+      if (item.offsetLeft < 0 && item.offsetLeft < -item.offsetWidth) {
+        marquee.querySelectorAll("div").forEach((e) => {
+          e.style.left = numerify(gap) / 2 - 1 + "px";
+        });
+        item.remove();
+        marquee.append(newItem());
+      }
+      item.style.left = `${numerify(item.style.left) - speed}px`;
+    });
+    requestAnimationFrame(render);
+  };
+
+  requestAnimationFrame(() => {
+    render();
+  });
+});
+</script>
